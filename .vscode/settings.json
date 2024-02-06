@@ -1,0 +1,9 @@
+{
+  "emmet.syntaxProfiles": {
+
+  },
+  "emmet.includeLanguages": {
+	"javascript": "javascriptreact"
+}
+출처: https://orbit-orbit.tistory.com/28 [Orbit:티스토리]
+}
