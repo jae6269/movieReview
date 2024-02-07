@@ -1,9 +1,9 @@
 import ReviewList from './ReviewList';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getReviews } from '../api';
 function App() {
   const [items, setItems] = useState([]);
-  const [order, setOrder] = useState('rating');
+  const [order, setOrder] = useState('createdAt');
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
   const handleNewestClick = () => setOrder('createdAt');
@@ -14,10 +14,14 @@ function App() {
     setItems(nextItems);
   };
 
-  const handleLoadClick = async () => {
-    const { reviews } = await getReviews();
+  const handleLoadClick = async (orderQuery) => {
+    const { reviews } = await getReviews(orderQuery);
     setItems(reviews);
   };
+
+  useEffect(() => {
+    handleLoadClick(order);
+  }, [order]);
 
   return (
     <div>
@@ -26,7 +30,6 @@ function App() {
         <button onClick={handleNewestClick}>최신순</button>
       </div>
       <ReviewList items={sortedItems} onDelete={handleDelelte}></ReviewList>
-      <button onClick={handleLoadClick}>불러오기</button>
     </div>
   );
 }
