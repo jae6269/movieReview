@@ -1,14 +1,14 @@
 import { useContext, useState } from 'react';
 import Rating from './Rating';
 import ReviewForm from './ReviewForm';
-import LocaleContext, { useLocale } from '../contexts/LocaleContext';
+import useTranslate from '../hooks/useTranslate';
 function formatDate(value) {
   const date = new Date(value);
   return `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}`;
 }
 
 function ReviewListItem({ item, onDelete, onEdit }) {
-  const locale = useLocale();
+  const t = useTranslate();
   const handleDelelteClick = () => onDelete(item.id);
   const handleEditClick = () => onEdit(item.id);
   return (
@@ -20,8 +20,8 @@ function ReviewListItem({ item, onDelete, onEdit }) {
         <p>{formatDate(item.createdAt)}</p>
         <p>{item.content}</p>
 
-        <button onClick={handleDelelteClick}>삭제</button>
-        <button onClick={handleEditClick}>수정</button>
+        <button onClick={handleDelelteClick}>{t('delete button')}</button>
+        <button onClick={handleEditClick}>{t('edit button')}</button>
       </div>
     </div>
   );
