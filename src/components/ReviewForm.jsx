@@ -2,12 +2,18 @@ import { useState } from 'react';
 import FileInput from './FileInput';
 import RatingInput from './RatingInput';
 import { createReview } from '../api';
+import useAsync from '../hooks/useAsync';
 const INITIAL_VALUE = { title: '', rating: 0, content: '', imgFile: null };
 
-function ReviewForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittingError, setSubmittingError] = useState(null);
-  const [values, setValues] = useState(INITIAL_VALUE);
+function ReviewForm({
+  initialValues = INITIAL_VALUE,
+  onSubmitSuccess,
+  onCancel,
+  imgPreview,
+  onSubmit,
+}) {
+  const [values, setValues] = useState(initialValues);
+  const [isSubmitting, submittingError, onSubmitAsync] = useAsync(onSubmit);
   const handleChange = (name, value) => {
     setValues((preValues) => ({
       ...preValues,
@@ -25,18 +31,12 @@ function ReviewForm() {
     formData.append('rating', values.rating);
     formData.append('content', values.content);
     formData.append('imgFile', values.imgFile);
-    try {
-      setSubmittingError(null);
-      setIsSubmitting(true);
-      await createReview(formData);
-    } catch (error) {
-      setSubmittingError(error);
-      return;
-    } finally {
-      setIsSubmitting(false);
-    }
+    let result = await onSubmitAsync(formData);
+    if (!result) return;
+    const { review } = result;
 
     setValues(INITIAL_VALUE);
+    onSubmitSuccess(review);
   };
   return (
     <form className="ReviewForm" onSubmit={handleSubmit}>
@@ -44,6 +44,7 @@ function ReviewForm() {
         name="imgFile"
         value={values.imgFile}
         onChange={handleChange}
+        imgPreview={imgPreview}
       ></FileInput>
       <input name="title" value={values.title} onChange={handleInputChange} />
       <RatingInput
@@ -59,7 +60,7 @@ function ReviewForm() {
       <button type="submit" disabled={isSubmitting}>
         확인
       </button>
-      {submittingError?.message && <div>{setSubmittingError.message}</div>}
+      {onCancel && <button onClick={onCancel}>취소</button>}
     </form>
   );
 }

@@ -22,3 +22,31 @@ export async function createReview(forData) {
   const body = await response.json();
   return body;
 }
+export async function updateReview(id, forData) {
+  const response = await fetch(
+    `https://learn.codeit.kr/3416/film-reviews/${id}`,
+    {
+      method: 'PUT',
+      body: forData,
+    }
+  );
+  if (!response.ok) {
+    throw new Error('리뷰 수정 실패 에러');
+  }
+  const body = await response.json();
+  return body;
+}
+
+export async function deleteReview(id) {
+  const response = await fetch(
+    `https://learn.codeit.kr/3416/film-reviews/${id}`,
+    {
+      method: 'DELETE',
+    }
+  );
+  if (!response.ok) {
+    throw new Error('리뷰 수정 실패 에러');
+  }
+  const body = await response.json();
+  return body;
+}
