@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { createReview, deleteReview, getReviews, updateReview } from '../api';
 import ReviewForm from './ReviewForm';
 import useAsync from '../hooks/useAsync';
+import LocaleContext from '../contexts/LocaleContext';
+import LocaleSelect from './LocaleSelect';
 const LIMIT = 6;
 
 function App() {
@@ -10,7 +12,9 @@ function App() {
   const [order, setOrder] = useState('createdAt');
   const [offset, setOffset] = useState(0);
   const [hasNext, setHasNext] = useState(false);
+  const [locale, setLocale] = useState('ko');
   const [isLoad, loadingError, getReviewsAsync] = useAsync(getReviews);
+
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
   const handleNewestClick = () => setOrder('createdAt');
@@ -59,27 +63,30 @@ function App() {
   }, [order]);
 
   return (
-    <div>
+    <LocaleContext.Provider value={locale}>
       <div>
-        <button onClick={handleBestClick}>평점순</button>
-        <button onClick={handleNewestClick}>최신순</button>
+        <LocaleSelect value={locale} onChange={setLocale} />
+        <div>
+          <button onClick={handleBestClick}>평점순</button>
+          <button onClick={handleNewestClick}>최신순</button>
+        </div>
+        {hasNext && (
+          <button disabled={isLoad} onClick={handleLoadMore}>
+            더보기
+          </button>
+        )}
+        <ReviewForm
+          onSubmit={createReview}
+          onSubmitSuccess={handleCreateSuccess}
+        ></ReviewForm>
+        <ReviewList
+          items={sortedItems}
+          onDelete={handleDelelte}
+          onUpdate={updateReview}
+          onUpdateSuccess={handleUpdateSuccess}
+        ></ReviewList>
       </div>
-      {hasNext && (
-        <button disabled={isLoad} onClick={handleLoadMore}>
-          더보기
-        </button>
-      )}
-      <ReviewForm
-        onSubmit={createReview}
-        onSubmitSuccess={handleCreateSuccess}
-      ></ReviewForm>
-      <ReviewList
-        items={sortedItems}
-        onDelete={handleDelelte}
-        onUpdate={updateReview}
-        onUpdateSuccess={handleUpdateSuccess}
-      ></ReviewList>
-    </div>
+    </LocaleContext.Provider>
   );
 }
 
