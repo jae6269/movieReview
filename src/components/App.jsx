@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { createReview, deleteReview, getReviews, updateReview } from '../api';
 import ReviewForm from './ReviewForm';
 import useAsync from '../hooks/useAsync';
-import LocaleContext from '../contexts/LocaleContext';
+import LocaleContext, { LocaleProvider } from '../contexts/LocaleContext';
 import LocaleSelect from './LocaleSelect';
 const LIMIT = 6;
 
@@ -12,7 +12,7 @@ function App() {
   const [order, setOrder] = useState('createdAt');
   const [offset, setOffset] = useState(0);
   const [hasNext, setHasNext] = useState(false);
-  const [locale, setLocale] = useState('ko');
+
   const [isLoad, loadingError, getReviewsAsync] = useAsync(getReviews);
 
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
@@ -63,9 +63,9 @@ function App() {
   }, [order]);
 
   return (
-    <LocaleContext.Provider value={locale}>
+    <LocaleProvider defaultvalue={'ko'}>
       <div>
-        <LocaleSelect value={locale} onChange={setLocale} />
+        <LocaleSelect />
         <div>
           <button onClick={handleBestClick}>평점순</button>
           <button onClick={handleNewestClick}>최신순</button>
@@ -86,7 +86,7 @@ function App() {
           onUpdateSuccess={handleUpdateSuccess}
         ></ReviewList>
       </div>
-    </LocaleContext.Provider>
+    </LocaleProvider>
   );
 }
 
